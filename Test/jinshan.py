@@ -1,5 +1,5 @@
 import json
-
+# 金山词霸翻译
 import requests
 
 class JinSan:

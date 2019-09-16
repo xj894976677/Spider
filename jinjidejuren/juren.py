@@ -102,19 +102,17 @@ class juren(object):
     def again(self, i, path, book):
         url = self.root + "/" + book[0] + "/index_" + str(i) + ".html"
         print(url)
-        html = requests.get(url, headers=self.headers).text
+        html = requests.get(url, headers=self.headers, timeout=3).text
         if html == '404':
-            self.lock.acquire()
             file_name = self.path + "\\" + "进击的巨人\\AAA.txt"
             with open(file_name, 'a+') as f:
                 f.write(str(book[1])+"章节下载完成")
-            self.lock.release()
             print('404')
             return False
         result = re.findall('var mhurl="(.*?)";', html)
         result = result[0]
         imgurl = 'http://p0.manhuapan.com/' + result
-        response = requests.get(imgurl, headers=self.headers)
+        response = requests.get(imgurl, headers=self.headers, timeout=3)
         file_name = path + "\\" + str(i) + ".jpg"
         with open(file_name, 'wb') as f:
             f.write(response.content)
@@ -124,17 +122,17 @@ class juren(object):
 
     # 开始爬取函数
     def spider(self):
-        temp = 0
-        while True:
-            flag = True
-            temp10 = temp + 10
-            if temp > len(self.allbook):
-                break
-            if temp10 > len(self.allbook):
-                temp10 = len(self.allbook)
-                flag = False
-            #     每次开启十个线程爬取十个章节
-            for book in self.allbook[temp:temp10]:
+        # temp = 0
+        # while True:
+        #     flag = True
+        #     temp10 = temp + 10
+        #     if temp > len(self.allbook):
+        #         break
+        #     if temp10 > len(self.allbook):
+        #         temp10 = len(self.allbook)
+        #         flag = False
+        #     #     每次开启十个线程爬取十个章节
+            for book in self.allbook:
                 print("sprider")
                 path = self.path + "\\" + "进击的巨人\\" + book[1]
                 os.makedirs(path)
@@ -146,11 +144,11 @@ class juren(object):
                 i.join()
                 print("第" + str(i) + "号线程已结束")
             print("进程全部结束")
-            temp += 10
-            print("spiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderok")
-            if not flag:
-                break
-        print("整本书爬取完毕")
+            # temp += 10
+            # print("spiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderok")
+            # if not flag:
+            #     break
+            print("整本书爬取完毕")
             # for i in range(0, 100):
             #     url = self.root + "/" + book[0] + "/index_" + str(i) + ".html"
             #     print(url)

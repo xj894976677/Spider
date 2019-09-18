@@ -23,23 +23,13 @@ class juren(object):
     # 创建ip代理池
     def ips(self):
         url = 'http://webapi.http.zhimacangku.com/getip?num=200&type=1&pro=&city=0&yys=0&port=1&pack=64043&ts=0&ys=0&cs=0&lb=1&sb=0&pb=4&mr=1&regions='
-        response = requests.get(url, headers=self.headers)
+        response = requests.get(url, headers=self.headers, timeout=10)
         ip_list = response.text.split('\r\n')
         for ip in ip_list:
             ip_dict = {}
             ip_dict['http'] = ip
             print("加入ip代理池成功")
             self.proxies_list.append(ip_dict)
-        # for proxies in self.proxies_list:
-        #     try:
-        #         requests.get('http://p0.manhuapan.com/2019/08/22151020345795.jpg', headers=self.headers, proxies=proxies)
-        #     except:
-        #         print(proxies, end='')
-        #         print("测试此ip代理爬取图片失败")
-        #     else:
-        #         self.picture_proxies_list.append(proxies)
-        #         print("此ip代理爬取图片可取")
-        # print("可用图片代理个数为" + str(len(self.picture_proxies_list)))
 
     # 获取代理ip函数
     def get_ip(self, picture=False):
@@ -49,7 +39,7 @@ class juren(object):
         flag = True
         while flag:
             try:
-                requests.get('https://www.baidu.com', headers=self.headers)
+                requests.get('https://www.baidu.com', headers=self.headers, timeout=10)
             except:
                 proxies = random.choice(self.proxies_list)
             else:
@@ -59,7 +49,7 @@ class juren(object):
     # 获取漫画全部章节
     def book(self):
 
-        html = requests.get(self.root, headers=self.headers).content.decode()
+        html = requests.get(self.root, headers=self.headers, timeout=10).content.decode()
         self.allbook = re.findall('<li class="pure-u-1-2 pure-u-lg-1-4"><a href="(.*?)" title="(.*?)">', html)
 
     # 线程函数-爬取图片入口，循环内容单独写在一个函数中，发生异常重新执行
@@ -83,36 +73,22 @@ class juren(object):
         self.count += 1
         print('\033[34m此章节爬取完毕此章节爬取完毕此章节爬取完毕此章节爬取完毕此章节爬取完毕此章节爬取完毕此章节爬取完毕\033[0m' + str(self.count))
         self.lock.release()
-            # url = self.root + "/" + book[0] + "/index_" + str(i) + ".html"
-            # print(url)
-            # html = requests.get(url, headers=self.headers).text
-            # if html == '404':
-            #     break
-            # result = re.findall('var mhurl="(.*?)";', html)
-            # result = result[0]
-            # imgurl = 'http://p0.manhuapan.com/' + result
-            # response = requests.get(imgurl, headers=self.headers)
-            # file_name = path + "\\" + str(i) + ".jpg"
-            # with open(file_name, 'wb') as f:
-            #     f.write(response.content)
-            # print(file_name + "successful")
-            # time.sleep(2)
 
     # 线程函数-爬取图片执行函数，循环内容单独写在一个函数中，发生异常重新执行
     def again(self, i, path, book):
         url = self.root + "/" + book[0] + "/index_" + str(i) + ".html"
         print(url)
-        html = requests.get(url, headers=self.headers, timeout=3).text
+        html = requests.get(url, headers=self.headers, timeout=10).text
         if html == '404':
             file_name = self.path + "\\" + "进击的巨人\\AAA.txt"
             with open(file_name, 'a+') as f:
-                f.write(str(book[1])+"章节下载完成")
+                f.write(str(book[1])+"章节下载完成\n")
             print('404')
             return False
         result = re.findall('var mhurl="(.*?)";', html)
         result = result[0]
         imgurl = 'http://p0.manhuapan.com/' + result
-        response = requests.get(imgurl, headers=self.headers, timeout=3)
+        response = requests.get(imgurl, headers=self.headers, timeout=10)
         file_name = path + "\\" + str(i) + ".jpg"
         with open(file_name, 'wb') as f:
             f.write(response.content)
@@ -122,16 +98,6 @@ class juren(object):
 
     # 开始爬取函数
     def spider(self):
-        # temp = 0
-        # while True:
-        #     flag = True
-        #     temp10 = temp + 10
-        #     if temp > len(self.allbook):
-        #         break
-        #     if temp10 > len(self.allbook):
-        #         temp10 = len(self.allbook)
-        #         flag = False
-        #     #     每次开启十个线程爬取十个章节
             for book in self.allbook:
                 print("sprider")
                 path = self.path + "\\" + "进击的巨人\\" + book[1]
@@ -144,32 +110,12 @@ class juren(object):
                 i.join()
                 print("第" + str(i) + "号线程已结束")
             print("进程全部结束")
-            # temp += 10
-            # print("spiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderokspiderok")
-            # if not flag:
-            #     break
             print("整本书爬取完毕")
-            # for i in range(0, 100):
-            #     url = self.root + "/" + book[0] + "/index_" + str(i) + ".html"
-            #     print(url)
-            #     html = requests.get(url, headers=self.headers).text
-            #     if html == '404':
-            #         break
-            #     result = re.findall('var mhurl="(.*?)";', html)
-            #     result = result[0]
-            #     imgurl = 'http://p0.manhuapan.com/' + result
-            #     response = requests.get(imgurl)
-            #     file_name = path + "\\" + str(i) + ".jpg"
-            #     with open(file_name, 'wb') as f:
-            #         f.write(response.content)
-            #     print(file_name + "successful")
-            #     time.sleep(2)
 
     # 程序执行入口
     def run(self):
         self.book()
         self.spider()
-
 
 
 if __name__ == '__main__':
